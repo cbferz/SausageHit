@@ -236,19 +236,19 @@ class SausageScene extends Component {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.07);
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(1.55, 7.55), width: 3.6, height: 1.1),
+      Rect.fromCenter(center: const Offset(1.55, 7.55), width: 3.6, height: 1.1),
       Paint()..color = const Color(0xFF111923),
     );
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(1.55, 7.42), width: 3.55, height: 0.88),
+      Rect.fromCenter(center: const Offset(1.55, 7.42), width: 3.55, height: 0.88),
       Paint()..color = const Color(0xFF718091),
     );
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(1.55, 7.36), width: 3.18, height: 0.66),
+      Rect.fromCenter(center: const Offset(1.55, 7.36), width: 3.18, height: 0.66),
       Paint()..color = const Color(0xFF293747),
     );
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(1.55, 7.28), width: 2.7, height: 0.42),
+      Rect.fromCenter(center: const Offset(1.55, 7.28), width: 2.7, height: 0.42),
       Paint()..color = const Color(0xFFDB8A4A),
     );
   }
@@ -326,7 +326,7 @@ class SausageScene extends Component {
     canvas.drawRRect(bodyRect, Paint()..color = const Color(0xFF9B3F32));
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(0, -0.035), width: 1.48, height: 0.43),
+        Rect.fromCenter(center: const Offset(0, -0.035), width: 1.48, height: 0.43),
         const Radius.circular(0.22),
       ),
       Paint()..color = const Color(0xFFE97952),

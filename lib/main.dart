@@ -1,4 +1,3 @@
-import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'game/sausage_game.dart';
 import 'ui/game_screen.dart';

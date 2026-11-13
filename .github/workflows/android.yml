@@ -26,6 +26,8 @@ jobs:
           cache: true
       - name: Generate Android platform scaffolding
         run: flutter create --platforms=android --project-name sausage_hit .
+      - name: Remove generated placeholder test
+        run: rm -f test/widget_test.dart
       - name: Force landscape orientation
         run: |
           python3 - <<'PY'

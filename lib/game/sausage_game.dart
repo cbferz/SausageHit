@@ -7,7 +7,7 @@ import 'level_loader.dart';
 enum RoundState { loading, aiming, flying, won, lost }
 
 class SausageGame extends Forge2DGame<Forge2DWorld> {
-  SausageGame() : super(gravity: Vector2(0, 9.8), zoom: 50);
+  SausageGame() : super(gravity: Vector2(0, 9.8));
 
   final LevelLoader _loader = LevelLoader();
   final ValueNotifier<RoundState> state = ValueNotifier(RoundState.loading);
@@ -125,6 +125,7 @@ class SausageGame extends Forge2DGame<Forge2DWorld> {
   Future<void> onLoad() async {
     await super.onLoad();
     camera.viewfinder.position = Vector2(12, 6.75);
+    camera.viewfinder.zoom = 50;
     await loadLevel(0);
   }
 

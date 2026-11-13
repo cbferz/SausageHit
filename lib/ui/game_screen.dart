@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flame/game.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import '../game/sausage_game.dart';
 

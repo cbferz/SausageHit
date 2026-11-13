@@ -1,3 +1,4 @@
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'game/sausage_game.dart';
 import 'ui/game_screen.dart';

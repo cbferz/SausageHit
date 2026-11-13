@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flame_forge2d/flame_forge2d.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'level_data.dart';
 import 'level_loader.dart';

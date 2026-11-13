@@ -1,0 +1,15 @@
+{
+  "id": 6,
+  "name": "Pantry Run",
+  "launchX": 1.5,
+  "launchY": 6.8,
+  "targetX": 18.5,
+  "targetY": 3.7,
+  "maxPull": 3.2,
+  "timeLimitSeconds": 34,
+  "obstacles": [
+    {"x": 5.0, "y": 6.25, "width": 0.8, "height": 3.9},
+    {"x": 9.4, "y": 5.55, "width": 0.9, "height": 5.0},
+    {"x": 14.0, "y": 5.8, "width": 0.85, "height": 4.8}
+  ]
+}

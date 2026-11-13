@@ -1,6 +1,4 @@
 import 'dart:math' as math;
-import 'package:flame/components.dart';
-import 'package:flame/game.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
 import 'level_data.dart';
@@ -9,7 +7,7 @@ import 'level_loader.dart';
 enum RoundState { loading, aiming, flying, won, lost }
 
 class SausageGame extends Forge2DGame<Forge2DWorld> {
-  SausageGame() : super(gravity: Vector2(0, 9.8), zoom: 18);
+  SausageGame() : super(gravity: Vector2(0, 9.8), zoom: 50);
 
   final LevelLoader _loader = LevelLoader();
   final ValueNotifier<RoundState> state = ValueNotifier(RoundState.loading);
@@ -21,25 +19,32 @@ class SausageGame extends Forge2DGame<Forge2DWorld> {
   double _elapsed = 0;
   double _aimX = 0;
   double _aimY = 0;
+  double _contactElapsed = 0;
   bool _isAiming = false;
+  bool _touchingTarget = false;
   final List<ObstacleBody> _obstacles = [];
+
+  Offset get aimDelta => Offset(_aimX, _aimY);
+  bool get isAiming => _isAiming;
 
   Future<void> loadLevel(int index) async {
     state.value = RoundState.loading;
     levelNumber.value = index + 1;
     level = await _loader.load(index);
     _elapsed = 0;
+    _contactElapsed = 0;
+    _touchingTarget = false;
+    _aimX = 0;
+    _aimY = 0;
     _clearBodies();
     final data = level!;
     world.add(GroundBody());
     sausage = SausageBody(
-      position: Vector2(data.launchX, data.launchY),
-      onHitTarget: _win,
+      initialPosition: Vector2(data.launchX, data.launchY),
+      onTargetContact: () => _touchingTarget = true,
+      onTargetLeave: () => _touchingTarget = false,
     );
-    target = TargetBody(
-      position: Vector2(data.targetX, data.targetY),
-      onHit: _win,
-    );
+    target = TargetBody(initialPosition: Vector2(data.targetX, data.targetY));
     world.add(sausage!);
     world.add(target!);
     for (final obstacle in data.obstacles) {
@@ -78,7 +83,7 @@ class SausageGame extends Forge2DGame<Forge2DWorld> {
     if (!_isAiming || level == null) return;
     final worldPoint = _screenToWorld(local, size);
     final origin = Vector2(level!.launchX, level!.launchY);
-    final delta = origin - worldPoint;
+    final delta = Vector2(origin.x - worldPoint.x, worldPoint.y - origin.y);
     final maxPull = level!.maxPull;
     final length = delta.length;
     if (length > maxPull) delta.scale(maxPull / length);
@@ -96,15 +101,11 @@ class SausageGame extends Forge2DGame<Forge2DWorld> {
   }
 
   Vector2 _screenToWorld(Offset point, Size size) {
-    final data = level!;
     final scale = math.min(size.width / 24, size.height / 13.5);
-    final originX = size.width / 2 - (data.launchX + 2.5) * scale;
-    final originY = size.height / 2 - 4.0 * scale;
-    return Vector2((point.dx - originX) / scale, (point.dy - originY) / scale);
-  }
-
-  void _win() {
-    if (state.value == RoundState.flying) state.value = RoundState.won;
+    return Vector2(
+      (point.dx - size.width / 2) / scale + 12,
+      (point.dy - size.height / 2) / scale + 6.75,
+    );
   }
 
   void restart() {
@@ -114,16 +115,13 @@ class SausageGame extends Forge2DGame<Forge2DWorld> {
 
   void nextLevel() {
     final next = levelNumber.value;
-    if (next >= LevelLoader.levelCount) {
-      loadLevel(0);
-    } else {
-      loadLevel(next);
-    }
+    loadLevel(next >= LevelLoader.levelCount ? 0 : next);
   }
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    camera.viewfinder.position = Vector2(12, 6.75);
     await loadLevel(0);
   }
 
@@ -132,11 +130,17 @@ class SausageGame extends Forge2DGame<Forge2DWorld> {
     super.update(dt);
     if (state.value == RoundState.flying) {
       _elapsed += dt;
+      if (_touchingTarget) {
+        _contactElapsed += dt;
+        if (_contactElapsed >= 0.5) state.value = RoundState.won;
+      } else {
+        _contactElapsed = 0;
+      }
       final remaining = (level!.timeLimitSeconds - _elapsed).ceil();
       remainingSeconds.value = remaining.clamp(0, level!.timeLimitSeconds);
       final body = sausage?.body;
       if (body != null &&
-          (body.position.x > 24 ||
+          (body.position.x > 28 ||
               body.position.x < -4 ||
               body.position.y > 16 ||
               _elapsed >= level!.timeLimitSeconds)) {
@@ -144,38 +148,44 @@ class SausageGame extends Forge2DGame<Forge2DWorld> {
       }
     }
   }
-
-  @override
-  void render(Canvas canvas) {
-    canvas.drawColor(const Color(0xFF202631), BlendMode.src);
-    super.render(canvas);
-  }
 }
 
 class SausageBody extends BodyComponent with ContactCallbacks {
-  SausageBody({required Vector2 position, required this.onHitTarget})
-      : super(
-          bodyDef: BodyDef(
-            type: BodyType.dynamic,
-            position: position,
-            angularDamping: 0.25,
-            linearDamping: 0.04,
-            bullet: true,
-          ),
-          shapeSpecs: [
-            ShapeSpec(
-              Capsule(Vector2(-0.55, 0), Vector2(0.55, 0), 0.28),
-              ShapeDef(
-                density: 1.3,
-                material: SurfaceMaterial(friction: 0.55, restitution: 0.28),
-                enableContactEvents: true,
-              ),
-            ),
-          ],
-        );
+  SausageBody({
+    required this.initialPosition,
+    required this.onTargetContact,
+    required this.onTargetLeave,
+  });
 
-  final VoidCallback onHitTarget;
+  final Vector2 initialPosition;
+  final VoidCallback onTargetContact;
+  final VoidCallback onTargetLeave;
   bool _launched = false;
+
+  @override
+  Body createBody() {
+    final body = world.createBody(BodyDef(
+      type: BodyType.dynamic,
+      position: initialPosition,
+      angularDamping: 0.25,
+      linearDamping: 0.04,
+      isBullet: true,
+      userData: this,
+    ));
+    body.createShape(
+      Capsule(
+        center1: Vector2(-0.55, 0),
+        center2: Vector2(0.55, 0),
+        radius: 0.28,
+      ),
+      ShapeDef(
+        density: 1.3,
+        material: SurfaceMaterial(friction: 0.55, restitution: 0.28),
+        enableContactEvents: true,
+      ),
+    );
+    return body;
+  }
 
   void launch(Vector2 impulse) {
     if (_launched) return;
@@ -185,23 +195,34 @@ class SausageBody extends BodyComponent with ContactCallbacks {
 
   @override
   void beginContact(Object other, Contact contact) {
-    if (other is TargetBody) onHitTarget();
+    if (other is TargetBody) onTargetContact();
+  }
+
+  @override
+  void endContact(Object other, Contact contact) {
+    if (other is TargetBody) onTargetLeave();
   }
 }
 
 class TargetBody extends BodyComponent {
-  TargetBody({required Vector2 position, required this.onHit})
-      : super(
-          bodyDef: BodyDef(type: BodyType.static, position: position),
-          shapeSpecs: [
-            ShapeSpec(
-              Circle(radius: 0.72),
-              ShapeDef(isSensor: true, enableSensorEvents: true),
-            ),
-          ],
-        );
+  TargetBody({required this.initialPosition});
 
-  final VoidCallback onHit;
+  final Vector2 initialPosition;
+
+  @override
+  Body createBody() {
+    final body = world.createBody(
+      BodyDef(type: BodyType.static, position: initialPosition, userData: this),
+    );
+    body.createShape(
+      Circle(radius: 0.72),
+      ShapeDef(
+        material: SurfaceMaterial(friction: 0.4, restitution: 0.15),
+        enableContactEvents: true,
+      ),
+    );
+    return body;
+  }
 }
 
 class GroundBody extends BodyComponent {
@@ -209,7 +230,7 @@ class GroundBody extends BodyComponent {
   Body createBody() {
     final body = world.createBody(BodyDef(type: BodyType.static));
     body.createShape(
-      Segment(point1: Vector2(-5, 8.2), point2: Vector2(26, 8.2)),
+      Segment(point1: Vector2(-5, 8.2), point2: Vector2(29, 8.2)),
       ShapeDef(material: SurfaceMaterial(friction: 0.8)),
     );
     return body;
@@ -229,7 +250,7 @@ class ObstacleBody extends BodyComponent {
           ),
           shapeSpecs: [
             ShapeSpec(
-              Polygon(box: Vector2(width / 2, height / 2)),
+              Polygon.box(width / 2, height / 2),
               ShapeDef(
                 material: SurfaceMaterial(friction: 0.65, restitution: 0.08),
               ),

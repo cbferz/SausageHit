@@ -24,8 +24,21 @@ jobs:
         with:
           channel: stable
           cache: true
-      - name: Flutter doctor
-        run: flutter doctor -v
+      - name: Generate Android platform scaffolding
+        run: flutter create --platforms=android --project-name sausage_hit .
+      - name: Force landscape orientation
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("android/app/src/main/AndroidManifest.xml")
+          text = path.read_text()
+          text = text.replace(
+              '<activity',
+              '<activity android:screenOrientation="landscape"',
+              1,
+          )
+          path.write_text(text)
+          PY
       - name: Get dependencies
         run: flutter pub get
       - name: Analyze

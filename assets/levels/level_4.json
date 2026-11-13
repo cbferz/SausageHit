@@ -1,0 +1,14 @@
+{
+  "id": 4,
+  "name": "Spice Rack",
+  "launchX": 1.5,
+  "launchY": 6.8,
+  "targetX": 12.5,
+  "targetY": 4.5,
+  "maxPull": 2.8,
+  "timeLimitSeconds": 30,
+  "obstacles": [
+    {"x": 4.5, "y": 6.65, "width": 0.8, "height": 2.7},
+    {"x": 8.2, "y": 5.8, "width": 0.8, "height": 4.4}
+  ]
+}

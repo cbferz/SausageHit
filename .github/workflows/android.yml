@@ -31,15 +31,26 @@ jobs:
       - name: Force landscape orientation
         run: |
           python3 - <<'PY'
+          import xml.etree.ElementTree as ET
           from pathlib import Path
+
           path = Path("android/app/src/main/AndroidManifest.xml")
-          text = path.read_text()
-          text = text.replace(
-              '<activity',
-              '<activity android:screenOrientation="landscape"',
-              1,
-          )
-          path.write_text(text)
+          android_ns = "http://schemas.android.com/apk/res/android"
+          ET.register_namespace("android", android_ns)
+
+          tree = ET.parse(path)
+          root = tree.getroot()
+          application = root.find("application")
+          if application is None:
+              raise SystemExit("AndroidManifest.xml has no application element")
+
+          activity = application.find("activity")
+          if activity is None:
+              raise SystemExit("AndroidManifest.xml has no main activity")
+
+          activity.set(f"{{{android_ns}}}screenOrientation", "landscape")
+          tree.write(path, encoding="utf-8", xml_declaration=True)
+          ET.parse(path)
           PY
       - name: Get dependencies
         run: flutter pub get

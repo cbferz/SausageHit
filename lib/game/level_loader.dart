@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'level_data.dart';
 
 class LevelLoader {
-  static const levelCount = 3;
+  static const levelCount = 8;
 
   Future<LevelData> load(int index) async {
     if (index < 0 || index >= levelCount) {

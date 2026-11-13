@@ -1,0 +1,15 @@
+{
+  "id": 5,
+  "name": "Sauce Jump",
+  "launchX": 1.5,
+  "launchY": 6.8,
+  "targetX": 16.5,
+  "targetY": 4.2,
+  "maxPull": 3.0,
+  "timeLimitSeconds": 32,
+  "obstacles": [
+    {"x": 5.2, "y": 6.25, "width": 0.8, "height": 3.9},
+    {"x": 10.0, "y": 5.7, "width": 0.85, "height": 4.7},
+    {"x": 13.1, "y": 6.55, "width": 0.8, "height": 3.0}
+  ]
+}

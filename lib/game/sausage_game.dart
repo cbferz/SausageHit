@@ -187,7 +187,6 @@ class SausageScene extends Component {
     ..strokeWidth = 0.035;
   final Paint _floorPaint = Paint()..color = const Color(0xFF59402F);
   final Paint _floorEdgePaint = Paint()..color = const Color(0xFFFFB45C);
-  final Paint _darkPaint = Paint()..color = const Color(0xFF17202B);
 
   @override
   void render(Canvas canvas) {

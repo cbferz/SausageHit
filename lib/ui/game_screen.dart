@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import '../game/sausage_game.dart';
@@ -32,10 +33,25 @@ class _GameScreenState extends State<GameScreen> {
             children: [
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onPanStart: (details) => game.beginAim(details.localPosition, size),
-                onPanUpdate: (details) => game.updateAim(details.localPosition, size),
-                onPanEnd: (_) => game.releaseAim(),
+                onPanStart: (details) {
+                  game.beginAim(details.localPosition, size);
+                  setState(() {});
+                },
+                onPanUpdate: (details) {
+                  game.updateAim(details.localPosition, size);
+                  setState(() {});
+                },
+                onPanEnd: (_) {
+                  game.releaseAim();
+                  setState(() {});
+                },
                 child: GameWidget(game: game),
+              ),
+              IgnorePointer(
+                child: CustomPaint(
+                  painter: _AimPainter(game),
+                  size: Size.infinite,
+                ),
               ),
               SafeArea(
                 child: Padding(
@@ -109,6 +125,45 @@ class _GameScreenState extends State<GameScreen> {
       ),
     );
   }
+}
+
+class _AimPainter extends CustomPainter {
+  const _AimPainter(this.game);
+
+  final SausageGame game;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final level = game.level;
+    if (!game.isAiming || level == null || game.aimDelta.distance < 0.08) {
+      return;
+    }
+
+    final scale = math.min(size.width / 24, size.height / 13.5);
+    final origin = Offset(
+      size.width / 2 + (level.launchX - 12) * scale,
+      size.height / 2 + (level.launchY - 6.75) * scale,
+    );
+    final velocity = game.aimDelta * 7.2;
+    final paint = Paint()
+      ..color = const Color(0xFFFFD166)
+      ..style = PaintingStyle.fill;
+
+    for (var t = 0.08; t <= 2.2; t += 0.12) {
+      final point = Offset(
+        origin.dx + velocity.dx * t * scale,
+        origin.dy + (velocity.dy * t + 4.9 * t * t) * scale,
+      );
+      if (point.dx < 0 || point.dx > size.width ||
+          point.dy < 0 || point.dy > size.height) {
+        break;
+      }
+      canvas.drawCircle(point, 2.6, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _AimPainter oldDelegate) => true;
 }
 
 class _HudPill extends StatelessWidget {

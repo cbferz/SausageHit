@@ -16,6 +16,7 @@ class SausageGame extends Forge2DGame<Forge2DWorld> {
   LevelData? level;
   SausageBody? sausage;
   TargetBody? target;
+  GroundBody? _ground;
   double _elapsed = 0;
   double _aimX = 0;
   double _aimY = 0;
@@ -38,7 +39,8 @@ class SausageGame extends Forge2DGame<Forge2DWorld> {
     _aimY = 0;
     _clearBodies();
     final data = level!;
-    world.add(GroundBody());
+    _ground = GroundBody();
+    world.add(_ground!);
     sausage = SausageBody(
       initialPosition: Vector2(data.launchX, data.launchY),
       onTargetContact: () => _touchingTarget = true,
@@ -62,13 +64,14 @@ class SausageGame extends Forge2DGame<Forge2DWorld> {
   }
 
   void _clearBodies() {
+    _ground?.removeFromParent();
+    _ground = null;
     sausage?.removeFromParent();
     target?.removeFromParent();
     for (final obstacle in _obstacles) {
       obstacle.removeFromParent();
     }
     _obstacles.clear();
-    children.whereType<GroundBody>().forEach((body) => body.removeFromParent());
     sausage = null;
     target = null;
   }

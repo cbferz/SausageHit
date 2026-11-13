@@ -1,0 +1,15 @@
+{
+  "id": 7,
+  "name": "Dinner Bell",
+  "launchX": 1.5,
+  "launchY": 6.8,
+  "targetX": 15.5,
+  "targetY": 2.9,
+  "maxPull": 3.3,
+  "timeLimitSeconds": 35,
+  "obstacles": [
+    {"x": 4.6, "y": 5.45, "width": 0.85, "height": 5.5},
+    {"x": 8.6, "y": 6.7, "width": 0.85, "height": 2.6},
+    {"x": 12.0, "y": 4.55, "width": 0.9, "height": 3.9}
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": 1,
+  "name": "First Fry",
+  "launchX": 1.5,
+  "launchY": 6.8,
+  "targetX": 10.5,
+  "targetY": 5.8,
+  "maxPull": 2.5,
+  "timeLimitSeconds": 25,
+  "obstacles": [
+    {"x": 6.2, "y": 6.6, "width": 0.65, "height": 2.2}
+  ]
+}

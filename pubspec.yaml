@@ -1,0 +1,20 @@
+name: sausage_hit
+description: A side-view sausage launcher game built with Flutter, Flame and Forge2D.
+publish_to: none
+version: 1.0.0+1
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+  flutter: ">=3.22.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  flame: ^1.38.0
+  flame_forge2d: ^0.20.0
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/levels/

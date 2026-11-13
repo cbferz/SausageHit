@@ -1,0 +1,15 @@
+{
+  "id": 3,
+  "name": "Dinner Dash",
+  "launchX": 1.5,
+  "launchY": 6.8,
+  "targetX": 19.0,
+  "targetY": 3.8,
+  "maxPull": 3.4,
+  "timeLimitSeconds": 35,
+  "obstacles": [
+    {"x": 6.0, "y": 6.3, "width": 0.7, "height": 3.0},
+    {"x": 11.0, "y": 5.7, "width": 0.9, "height": 4.2},
+    {"x": 15.2, "y": 4.7, "width": 0.8, "height": 5.0}
+  ]
+}
